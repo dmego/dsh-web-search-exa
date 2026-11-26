@@ -1,0 +1,15 @@
+# macOS
+.DS_Store
+
+# Dependencies (this package declares none at runtime; only the monorepo devDeps were used upstream)
+node_modules/
+
+# Runtime cooldown ledger never belongs in version control: it names keys by hash
+# and describes which Exa team is currently out of credits.
+exa-key-state.json
+*.tmp
+
+# Editor / tooling
+*.log
+.idea/
+.vscode/

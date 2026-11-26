@@ -1,45 +1,37 @@
 {
-  "name": "@deepseek-ai/dsh-web-search-exa",
-  "description": "Exa-backed search provider for the DeepSeek Harness web capability seam (ctx.web)",
-  "version": "0.2.2-rc.1",
-  "publishConfig": {
-    "access": "public"
-  },
+  "name": "@local/dsh-web-search-exa",
+  "version": "0.2.2-rc.5",
+  "description": "Exa-backed search provider for the DSH web seam (ctx.web). Local rebuild of @deepseek-ai/dsh-web-search-exa@0.2.2-rc.1, made self-contained so a link: bundle loads under dsh 0.2.2-rc.5.",
+  "private": true,
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/deepseek-ai/deepseek-harness.git",
-    "directory": "packages/web/web-search-exa"
+    "url": "git+https://github.com/dmego/dsh-web-search-exa.git"
   },
   "type": "module",
-  "main": "lib/index.js",
-  "types": "lib/types/index.d.ts",
+  "license": "MIT",
+  "main": "./index.js",
   "exports": {
-    ".": {
-      "types": "./lib/types/index.d.ts",
-      "default": "./lib/index.js"
-    },
-    "./src/*": "./src/*",
+    ".": "./index.js",
     "./locale/*.json": "./locale/*.json",
     "./package.json": "./package.json"
   },
+  "icon": "icon.svg",
+  "engines": {
+    "node": ">=20"
+  },
+  "dsh": {
+    "bundle": {
+      "patch": "./cordis.patch.yml"
+    }
+  },
   "files": [
-    "locale/*.json",
-    "lib/index.js",
-    "lib/types/**/*.d.ts"
-  ],
-  "license": "MIT",
-  "peerDependencies": {
-    "@deepseek-ai/dsh-launch-environment": "workspace:*",
-    "@deepseek-ai/dsh-web": "workspace:*",
-    "@deepseek-ai/cordis": "workspace:~"
-  },
-  "dependencies": {
-    "@deepseek-ai/schemastery": "workspace:~"
-  },
-  "devDependencies": {
-    "@deepseek-ai/dsh-launch-environment": "workspace:*",
-    "@deepseek-ai/dsh-web": "workspace:*",
-    "@deepseek-ai/cordis": "workspace:~",
-    "@deepseek-ai/dsh-http-proxy": "workspace:*"
-  }
+    "index.js",
+    "cordis.patch.yml",
+    "icon.svg",
+    "ADAPTATION.md",
+    "README.md",
+    "README.zh.md",
+    "locale",
+    "LICENSE"
+  ]
 }

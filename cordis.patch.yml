@@ -1,0 +1,22 @@
+# Local Exa web search provider bundle.
+#
+# Rebuilt from @deepseek-ai/dsh-web-search-exa@0.2.2-rc.1 (tag dsh-v0.2.2-rc.1)
+# and made self-contained so it loads under dsh 0.2.2-rc.5. The row id/name are
+# deliberately distinct from the profile's `web-search-exa` row (that one pins
+# rc.1 peers and is denied by the startup version gate), so only this row
+# registers the `exa` provider.
+#
+# API keys are deliberately NOT written here. They are read from the launch
+# environment, which dsh fills from the invoking directory's `.env` and then
+# `~/.dsh/.env`:
+#
+#   EXA_API_KEYS=team-a-key,team-b-key,team-c-key   # several Exa teams
+#   EXA_API_KEY=team-a-key                          # single-key shorthand
+#
+# Keys may be separated by commas, semicolons or whitespace; duplicates collapse.
+# Several keys only pay off across different Exa teams, because credits and QPS
+# are billed per team. An explicit `config: apiKeys: [...]` list works too, but
+# keeping secrets in the environment lets this patch be committed as-is.
+- insert:
+    - id: web-search-exa-local
+      name: '@local/dsh-web-search-exa'
