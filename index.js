@@ -1,4 +1,5 @@
-// Local adaptation for dsh 0.2.2-rc.5 (see ADAPTATION.md).
+// Local adaptation of @deepseek-ai/dsh-web-search-exa@0.2.2-rc.1 with no DSH version
+// constraint (last verified on dsh 0.2.2-rc.5). See ADAPTATION.md.
 // A workspace `link:` bundle is imported from its real path, where the loader's
 // bare @deepseek-ai/* specifier rewriting does not apply. These self-contained
 // equivalents replace the DSH runtime imports so the module can load.

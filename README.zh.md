@@ -1,5 +1,5 @@
 ---
-description: "ctx.web 的 Exa 搜索提供方本地分支：在 dsh 0.2.2-rc.5 上恢复 Exa 搜索，并支持跨 Exa team 的多密钥轮换与冷却。"
+description: "ctx.web 的 Exa 搜索提供方本地分支：不声明 DSH 版本约束，随 dsh 升级继续加载（当前验证在 0.2.2-rc.5），并支持跨 Exa team 的多密钥轮换与冷却。"
 kind: "package-reference"
 ---
 
@@ -8,8 +8,8 @@ kind: "package-reference"
 [English](README.md) | 中文
 
 上游 [`@deepseek-ai/dsh-web-search-exa@0.2.2-rc.1`](https://github.com/deepseek-ai/deepseek-harness/tree/dsh-v0.2.2-rc.1/packages/web/web-search-exa)
-的独立重建，让它在 **dsh 0.2.2-rc.5** 上继续工作，并补上上游没有的**跨 Exa team 多密钥轮换**。
-包名是 `@local/dsh-web-search-exa`，不会顶掉官方包。
+的独立重建：拿掉钉死的 DSH 版本范围，让它跟着 dsh 继续升级（当前在 **dsh 0.2.2-rc.5** 上验证），
+并补上上游没有的**跨 Exa team 多密钥轮换**。包名是 `@local/dsh-web-search-exa`，不会顶掉官方包。
 
 `vendor:` 提交是上游原样基线，`adapt:` / `feat:` 两次提交是本仓库的全部改动，`git diff` 可以逐行对照。
 改造理由、多密钥语义与验证方法的详细版本见 [ADAPTATION.md](ADAPTATION.md)。
@@ -29,11 +29,24 @@ npm 上最高只发布到 rc.1，官方仓库在 rc.2 之后直接删掉了 `pac
 既没有可升级的版本，也没有能提 PR 的地方。于是以已安装 npm 包的 `lib/index.js`（完整编译产物）
 为基础重建：搜索逻辑与官方 rc.1 是同一份代码，改动都在周边。
 
+## 版本策略
+
+本包不声明任何 DSH 版本要求：既没有 `engines.dsh`，也没有 `@deepseek-ai/dsh*` 的 `peerDependencies`。
+启动门禁（`dsh-app-boot` 的 `plugin-compatibility.ts`）只在存在这两类字段时才比较版本；两者都没有，
+它就没有可拒绝的条件，任何 dsh 运行时都会正常加载 —— 不会再像上游 rc.1 那样被新版本挡住。
+
+因此 `package.json` 的 `version` 只是「最后在哪个 dsh 版本上核对过」的记录（当前是 `0.2.2-rc.5`），
+不是兼容下限或上限。
+
+每次 dsh 升级后的做法：先跑 `node test/multi-key.test.mjs`（纯桩、不联网），再跑一次真实的
+`node test/live-check.mjs "exa pricing"`。若 dsh 改动了 `ctx.web` 的 provider 接口，修改
+[index.js](index.js) 后把 `version` 挪到新的运行时版本。
+
 ## 相对上游改了什么
 
 | # | 改进 | 上游行为 | 本分支 |
 |---|---|---|---|
-| 1 | **解除版本门禁** | `peerDependencies` 钉死 DSH `0.2.2-rc.1`，rc.5 直接拒绝加载 | 删掉 `peerDependencies` 与 `engines.dsh`，版本号对齐 `0.2.2-rc.5` |
+| 1 | **解除版本门禁** | `peerDependencies` 钉死 DSH `0.2.2-rc.1`，之后每个 dsh 版本都拒绝加载 | 删掉 `peerDependencies` 与 `engines.dsh`，不再留任何 DSH 版本范围；`version` 只记录最后核对过的运行时 |
 | 2 | **`link:` 安装可用** | 从真实路径加载时裸 `@deepseek-ai/*` import 解析失败（`ERR_MODULE_NOT_FOUND`），`link:` 装不进去 | 自包含改造：本地 `WebError`、`launchEnvironmentOf()`、`environmentReaderOf(ctx)`，去掉 schemastery `Config`，零运行时依赖 |
 | 3 | **多密钥轮换** ⭐ | 只认一把 `apiKey` | 多把 key 跨 Exa team 轮转（注册表仍是单 provider，见下节） |
 | 4 | **额度耗尽的冷却阶梯** ⭐ | 一把 key 用干后，每次搜索都撞同一个 402 | 命中即停放，5min → 30min → 2h → 8h → 24h 递增，同一次搜索立刻换下一把 |

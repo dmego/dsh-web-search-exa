@@ -1,5 +1,5 @@
 ---
-description: "Local fork of the Exa-backed search provider for ctx.web: rebuilt for dsh 0.2.2-rc.5, with multi-key rotation and cooldown across Exa teams."
+description: "Local fork of the Exa-backed search provider for ctx.web: no DSH version constraint, so it keeps loading across dsh releases (verified on 0.2.2-rc.5), with multi-key rotation and cooldown across Exa teams."
 kind: "package-reference"
 ---
 
@@ -8,9 +8,9 @@ kind: "package-reference"
 English | [中文](README.zh.md)
 
 A standalone rebuild of [`@deepseek-ai/dsh-web-search-exa@0.2.2-rc.1`](https://github.com/deepseek-ai/deepseek-harness/tree/dsh-v0.2.2-rc.1/packages/web/web-search-exa)
-that keeps working on **dsh 0.2.2-rc.5** and adds **multi-key rotation across several Exa teams**,
-which upstream does not have. The package name is `@local/dsh-web-search-exa`, so it never shadows the
-official package.
+with its pinned DSH version range removed, so it keeps loading as dsh moves forward (currently verified
+on **dsh 0.2.2-rc.5**). It also adds **multi-key rotation across several Exa teams**, which upstream does
+not have. The package name is `@local/dsh-web-search-exa`, so it never shadows the official package.
 
 The `vendor:` commit is the upstream baseline verbatim; `adapt:` and `feat:` are the only local changes,
 so `git diff` reads as a review. [ADAPTATION.md](ADAPTATION.md) (Chinese) has the long form: why the
@@ -33,11 +33,25 @@ after rc.2 — there is no newer version to install and no directory left to sen
 starts from the installed npm package's `lib/index.js` (the complete compiled output), so the search logic
 is byte-for-byte upstream rc.1 and every change sits around it.
 
+## Version policy
+
+This package declares no DSH version requirement at all: no `engines.dsh`, and no `@deepseek-ai/dsh*`
+`peerDependencies`. The startup gate (`dsh-app-boot`'s `plugin-compatibility.ts`) only compares versions
+when one of those fields exists; with neither it has nothing to reject, so any dsh runtime loads the bundle
+instead of blocking it the way upstream rc.1 got blocked.
+
+`package.json`'s `version` is therefore a record of the dsh release the bundle was last checked against —
+currently `0.2.2-rc.5` — not a compatibility floor or ceiling.
+
+On each dsh upgrade: run `node test/multi-key.test.mjs` (pure stubs, no network), then one real
+`node test/live-check.mjs "exa pricing"`. If dsh changed the `ctx.web` provider surface, update
+[index.js](index.js) and move `version` to the new runtime version.
+
 ## What changed against upstream
 
 | # | Improvement | Upstream | This fork |
 |---|---|---|---|
-| 1 | **Version gate cleared** | `peerDependencies` pinned to DSH `0.2.2-rc.1`, rc.5 refuses to load it | `peerDependencies` and `engines.dsh` removed, version aligned to `0.2.2-rc.5` |
+| 1 | **Version gate cleared** | `peerDependencies` pinned to DSH `0.2.2-rc.1`, so every later dsh refuses to load it | `peerDependencies` and `engines.dsh` removed — no DSH range left to reject; `version` merely records the runtime it was last checked on |
 | 2 | **Installable as a `link:` bundle** | loaded from its real path, the bare `@deepseek-ai/*` imports fail with `ERR_MODULE_NOT_FOUND`, so `link:` never mounts | self-contained: local `WebError`, `launchEnvironmentOf()`, `environmentReaderOf(ctx)`, schemastery `Config` dropped, zero runtime dependencies |
 | 3 | **Multi-key rotation** ⭐ | one `apiKey` only | several keys across Exa teams take turns (still one provider — see below) |
 | 4 | **Credit-exhaustion cooldown** ⭐ | once a key is out of credits, every search hits the same 402 | the key is parked immediately and its cooldown steps 5min → 30min → 2h → 8h → 24h; the same search continues on the next key |

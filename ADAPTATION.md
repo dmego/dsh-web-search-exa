@@ -3,7 +3,8 @@
 英文版见 [README.md](README.md)；本文件只讲**这个仓库相对上游**改了什么、为什么改。
 
 本仓库是 `@deepseek-ai/dsh-web-search-exa@0.2.2-rc.1`（tag `dsh-v0.2.2-rc.1`）的
-独立重建，目标是在 **dsh 0.2.2-rc.5** 上继续用 Exa 搜索，并额外支持多把 Exa 密钥。
+独立重建：去掉钉死的 DSH 版本范围，让它在 dsh 后续版本中继续可用（当前验证在 **0.2.2-rc.5**），
+并额外支持多把 Exa 密钥。
 `vendor:` 提交是上游原样基线，`adapt:` / `feat:` 两次提交是本仓库的改动，
 `git diff` 可以逐行看到差异。
 
@@ -29,9 +30,12 @@ npm 上该包最高只发布到 `0.2.2-rc.1`，官方仓库在 `0.2.2-rc.2` 之�
 
 ### 1. `package.json`
 
-- `version` → `0.2.2-rc.5`（与目标 dsh 对齐），包名改为私有名 `@local/dsh-web-search-exa`；
+- `version` → `0.2.2-rc.5`（只表示**最后核对过的 dsh 版本**，不是兼容范围），包名改为私有名
+  `@local/dsh-web-search-exa`；
 - **删除**钉死 rc.1 的 `peerDependencies`（这正是门禁判定不兼容的依据），也不声明
-  `engines.dsh`，让门禁无版本约束可拒绝；
+  `engines.dsh`，让门禁无版本约束可拒绝 —— 判定逻辑见 `dsh-app-boot` 的
+  `plugin-compatibility.ts`：两类字段都没有时直接视为兼容，任何 dsh 版本都放行，所以后续
+  dsh 升级不会再被挡住；升级后按 `test/` 的两条命令核对即可；
 - 声明 `dsh.bundle.patch`，使它可以作为正式 bundle 安装；
 - 不声明任何运行时依赖（见第 3 点），`private: true`。
 
@@ -141,7 +145,7 @@ pnpm add "link:/path/to/dsh-web-search-exa"
 
 ## 遗留
 
-- 这是第三方适配副本，官方仍把「rc.1 插件跑在 rc.5」标为不受支持。若日后官方发布与
-  当前 dsh 兼容的版本，可切回官方包并移除本 bundle。
+- 这是第三方适配副本；上游已删除该目录，官方不再为它出任何版本。若日后官方在某个 dsh 版本里
+  重新提供带多密钥能力的包，可切回官方包并移除本 bundle。
 - 上游 `tests/*.spec.ts` 原样保留，但它们依赖 monorepo 的 workspace 依赖与本仓不提供的
   构建链，因此不在此处运行；本仓库的验证以 `test/` 下的 `.mjs` 为准。
