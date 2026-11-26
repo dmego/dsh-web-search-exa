@@ -7,6 +7,13 @@ kind: "package-reference"
 
 English | [中文](README.zh.md)
 
+> **Local fork.** This repository is a standalone rebuild of the package as published at tag
+> `dsh-v0.2.2-rc.1`, kept working on dsh `0.2.2-rc.5` and extended with **multi-key rotation
+> across several Exa teams**. The `vendor:` commit is the upstream baseline verbatim; what
+> changed after it — the self-contained rebuild, why it was needed, the cooldown ladder — is
+> documented in [ADAPTATION.md](ADAPTATION.md) (Chinese) . Install and configure it from there
+> rather than from the sections below, which still describe the upstream package.
+
 ## Summary
 
 With `dsh-web-search-exa`, the harness searches the web through Exa and gets vendor-native results with portable snippets and publication dates. Choose it when a deployment has an Exa API key and wants Exa's keyword or neural search. Exa returns no generated answer, so results carry no `content` — only citeable sources. A result with no non-blank highlight is dropped, so a call can return fewer sources than requested. The model-facing `web_search` tool lives in `dsh-tool-web`.

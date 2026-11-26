@@ -1,7 +1,7 @@
 {
   "name": "@local/dsh-web-search-exa",
   "version": "0.2.2-rc.5",
-  "description": "Exa-backed search provider for the DSH web seam (ctx.web). Local rebuild of @deepseek-ai/dsh-web-search-exa@0.2.2-rc.1, made self-contained so a link: bundle loads under dsh 0.2.2-rc.5.",
+  "description": "Exa-backed search provider for the DSH web seam (ctx.web). Local rebuild of @deepseek-ai/dsh-web-search-exa@0.2.2-rc.1, made self-contained so a link: bundle loads under dsh 0.2.2-rc.5, with multi-key rotation and cooldown across several Exa teams.",
   "private": true,
   "repository": {
     "type": "git",
