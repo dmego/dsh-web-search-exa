@@ -119,8 +119,10 @@ EXA_API_KEY=team-a-key
 ```sh
 # profile 目录通常为 ~/.dsh/profiles/<name>
 pnpm add "link:/path/to/dsh-web-search-exa"
-dsh plugin install_bundle @local/dsh-web-search-exa
 ```
+
+再用 dsh 的 plugin manager 执行 `install_bundle`，或把 `@local/dsh-web-search-exa` 加进 profile
+`package.json` 的 `dsh.profile.bundles`。本包的 `cordis.patch.yml` 会自己插入启用行，不需要手写。
 
 ## 验证
 
